@@ -8,12 +8,20 @@ class Produk extends CI_Controller {
 		$search = $_GET['search'];
 		if($type == 'json'){
 			if($search != ''){
-				$produk = $this->db->query("SELECT id_produk,nama_produk,gambar,harga_konsumen,diskon FROM rb_produk WHERE nama_produk LIKE '%$search%' ORDER BY id_produk DESC LIMIT $page")->result();
+				//if($this->db->query("SELECT id_produk,nama_produk,gambar,harga_konsumen,diskon FROM rb_produk WHERE nama_produk LIKE '%$search%' ORDER BY id_produk DESC LIMIT $page")->num_rows=='1'){
+					$produk = $this->db->query("SELECT * FROM rb_produk WHERE nama_produk LIKE '%$search%' ORDER BY id_produk DESC LIMIT $page")->result();
+					//$hasil = '1';
+					//$prod = $produk->result();
+				//}else{
+					//$hasil = '0';
+				//}
 			}else{
 			//$record = $this->model_app->view_ordering_limit('rb_produk','id_produk','DESC','0',$page)->result_array();
-				$produk = $this->db->query("SELECT id_produk,nama_produk,gambar,harga_konsumen,diskon FROM rb_produk ORDER BY id_produk DESC LIMIT $page")->result();
+				$produk = $this->db->query("SELECT * FROM rb_produk ORDER BY id_produk DESC LIMIT $page")->result();
+				//$hasil = '1';
+				//$prod = $produk->result();
 			}
-			$j = $this->db->query("SELECT id_produk, CASE WHEN SUM(jumlah) = 0 THEN '0' ELSE SUM(jumlah) END as jual FROM `rb_penjualan` a JOIN rb_penjualan_detail b ON a.id_penjualan=b.id_penjualan where a.proses!='0' GROUP BY b.id_produk")->result();
+			$j = $this->db->query("SELECT id_produk, CASE WHEN SUM(jumlah) = 0 THEN '0' ELSE SUM(jumlah) END as jual FROM `rb_penjualan` a JOIN rb_penjualan_detail b ON a.id_penjualan=b.id_penjualan where a.proses!='0' GROUP BY b.id_produk");
 			$b = $this->db->query("SELECT id_produk, sum(jumlah_pesan) as beli FROM `rb_pembelian_detail` GROUP BY id_produk")->result();
 			$stok = $this->db->query("SELECT b.id_produk, (SUM(c.jumlah_pesan)-SUM(b.jumlah)) AS stok FROM rb_penjualan a JOIN rb_penjualan_detail b ON a.id_penjualan=b.id_penjualan JOIN rb_pembelian_detail c ON b.id_produk=c.id_produk WHERE a.proses!='0' GROUP BY b.id_produk")->result();
 			//$j = $this->model_app->jual_umum($row['id_produk'])->row_array();
@@ -30,10 +38,8 @@ class Produk extends CI_Controller {
 			}*/
 			//$produk = $this->db->query("SELECT * FROM rb_produk a JOIN rb_penjualan_detail b ON b.id_produk=a.id_produk JOIN rb_penjualan c ON b.id_penjualan=c.id_penjualan ORDER BY a.id_produk DESC LIMIT $page")->result();
 			$data = array(
+				'hasil' => $hasil,
 				'produk' => $produk,
-				'jual' => $j,
-				'beli' => $b,
-				'stok' => $stok
 			);
 			echo json_encode($produk);
 		}else{
