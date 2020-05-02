@@ -72,11 +72,29 @@ class Produk extends CI_Controller {
 		}
 	}
 
+	public function show(){
+		$kategori = $this->db->query("SELECT * FROM (SELECT a.*,b.produk FROM (SELECT * FROM `rb_kategori_produk`) as a LEFT JOIN
+										(SELECT id_kategori_produk, COUNT(*) produk FROM rb_produk GROUP BY id_kategori_produk HAVING COUNT(id_kategori_produk)) as b on a.id_kategori_produk=b.id_kategori_produk ORDER BY RAND()) as c  ORDER BY c.id_kategori_produk DESC")->result();
+		foreach($kategori as $kat){
+			$produk = $this->model_app->produk_perkategori(0,0,$kat['id_kategori_produk'],6)->result_array();
+			echo json_encode($produk);
+		}
+		//echo json_encode($kat);
+	}
+
 	function kategori(){
 		$type = $_GET['type'];
+		$id = $_GET['id'];
+		$page = $_GET['page'];
 		if($type == 'json'){
-			$print = $this->model_app->view_ordering('rb_kategori_produk', 'nama_kategori', 'ASC');
-			echo json_encode($print);
+			if($id == ''){
+				$print = $this->model_app->view_ordering('rb_kategori_produk', 'nama_kategori', 'ASC');
+				echo json_encode($print);
+			}else{
+				$print = $this->db->query("SELECT * FROM rb_produk a JOIN rb_kategori_produk b ON a.id_kategori_produk=b.id_kategori_produk WHERE b.id_kategori_produk = $id ORDER BY a.id_produk DESC LIMIT $page")->result_array();
+				//$print = $this->model_app->view_where_ordering('rb_kategori_produk', array('id_kategori_produk'=>$id), 'nama_kategori', 'ASC');
+				echo json_encode($print);
+			}
 		}else{
 			$cek = $this->model_app->edit('rb_kategori_produk',array('kategori_seo'=>$this->uri->segment(3)))->row_array();
 			$jumlah= $this->model_app->view_where('rb_produk',array('id_kategori_produk'=>$cek['id_kategori_produk']))->num_rows();
