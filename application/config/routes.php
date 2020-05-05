@@ -68,7 +68,8 @@ $route = array(
     'testimoni' => 'testimoni',
     'video' => 'video',
     'keranjang' => 'produk/keranjang',
-    'json' => 'json'
+    'json' => 'json',
+    'api' => 'api'
 );
 
 $route['(:any)'] = 'ref/$1/$2';

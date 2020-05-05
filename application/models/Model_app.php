@@ -41,8 +41,7 @@ class Model_app extends CI_model{
     }
 
     public function produk_perkategori($id_reseller,$id_produk_perusahaan,$id_kategori_produk,$limit){
-        return $this->db->query("SELECT a.*, b.nama_reseller, c.nama_kota FROM rb_produk a LEFT JOIN rb_reseller b ON a.id_reseller=b.id_reseller
-                                    LEFT JOIN rb_kota c ON b.kota_id=c.kota_id where a.id_reseller!='$id_reseller' AND a.id_produk_perusahaan='$id_produk_perusahaan' AND a.id_kategori_produk='$id_kategori_produk' ORDER BY a.id_produk DESC LIMIT $limit");
+        return $this->db->query("SELECT * FROM rb_produk WHERE id_kategori_produk='$id_kategori_produk' ORDER BY id_produk DESC LIMIT $limit ");
     }
 
     public function view_ordering($table,$order,$ordering){

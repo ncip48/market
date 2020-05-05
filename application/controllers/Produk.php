@@ -6,6 +6,7 @@ class Produk extends CI_Controller {
 		$type = $_GET['type'];
 		$page = $_GET['page'];
 		$search = $_GET['search'];
+		$id_kategori = $_GET['id_kategori'];
 		if($type == 'json'){
 			if($search != ''){
 				//if($this->db->query("SELECT id_produk,nama_produk,gambar,harga_konsumen,diskon FROM rb_produk WHERE nama_produk LIKE '%$search%' ORDER BY id_produk DESC LIMIT $page")->num_rows=='1'){
@@ -17,7 +18,11 @@ class Produk extends CI_Controller {
 				//}
 			}else{
 			//$record = $this->model_app->view_ordering_limit('rb_produk','id_produk','DESC','0',$page)->result_array();
-				$produk = $this->db->query("SELECT * FROM rb_produk ORDER BY id_produk DESC LIMIT $page")->result();
+				if($id_kategori != ''){
+					$produk = $this->db->query("SELECT * FROM rb_produk WHERE id_kategori_produk = $id_kategori ORDER BY id_produk DESC LIMIT 6")->result();
+				}else{
+					$produk = $this->db->query("SELECT * FROM rb_produk ORDER BY id_produk DESC LIMIT $page")->result();
+				}
 				//$hasil = '1';
 				//$prod = $produk->result();
 			}
@@ -73,13 +78,91 @@ class Produk extends CI_Controller {
 	}
 
 	public function show(){
+		//$category = array();
+		//$produks = array();
 		$kategori = $this->db->query("SELECT * FROM (SELECT a.*,b.produk FROM (SELECT * FROM `rb_kategori_produk`) as a LEFT JOIN
-										(SELECT id_kategori_produk, COUNT(*) produk FROM rb_produk GROUP BY id_kategori_produk HAVING COUNT(id_kategori_produk)) as b on a.id_kategori_produk=b.id_kategori_produk ORDER BY RAND()) as c  ORDER BY c.id_kategori_produk DESC")->result();
-		foreach($kategori as $kat){
-			$produk = $this->model_app->produk_perkategori(0,0,$kat['id_kategori_produk'],6)->result_array();
-			echo json_encode($produk);
+										(SELECT id_kategori_produk, COUNT(*) produk FROM rb_produk GROUP BY id_kategori_produk HAVING COUNT(id_kategori_produk)) as b on a.id_kategori_produk=b.id_kategori_produk ORDER BY RAND()) as c  ORDER BY c.id_kategori_produk DESC");
+		foreach($kategori->result_array() as $kat){
+			//echo $kat['nama_kategori'];
+			echo "<b>".$kat[nama_kategori] . "</b><br>";
+			//$kategori_push = array_push($array, $kat[nama_kategori]);
+			//$json_decoded = json_decode($kat);
+    		//$category[] = array('id_kategori' => $kat[id_kategori_produk], 'nama_kategori' => $kat[nama_kategori], produk => array());
+			$category[] = array('id_kategori' => $kat[id_kategori_produk], 'nama_kategori' => $kat[nama_kategori], produk => $produks);
+			$produk = $this->model_app->produk_perkategori(0,0,$kat['id_kategori_produk'],6);
+			foreach($produk->result_array() as $prod){
+				//$produks[] = array();
+					//array_push($produks, array('produk' => $prod));
+					echo $prod[nama_produk] . "<br>";
+					//echo json_encode($prod);
+					//echo $produk;
+					
+				}
+				
 		}
-		//echo json_encode($kat);
+		//print_r($category);
+		//echo json_encode($category);
+		//echo json_encode($kategori->result_array());
+		//echo json_encode($kategori->result_array());
+	}
+
+	public function show3(){
+		$kategori = $this->db->query("SELECT * FROM (SELECT a.*,b.produk FROM (SELECT * FROM `rb_kategori_produk`) as a LEFT JOIN
+										(SELECT id_kategori_produk, COUNT(*) produk FROM rb_produk GROUP BY id_kategori_produk HAVING COUNT(id_kategori_produk)) as b on a.id_kategori_produk=b.id_kategori_produk ORDER BY RAND()) as c  ORDER BY c.id_kategori_produk DESC");
+		
+		$kategori = $this->db->query("SELECT * FROM rb_kategori_produk ORDER BY id_kategori_produk DESC");	
+		foreach($kategori->result_array() as $kat){
+			$idk = $kat[id_kategori_produk];
+			$ktg = $kat[nama_kategori];
+			//echo "<b>".$kat[nama_kategori] . "</b><br>";
+			//$category[] = array('id_kategori' => $kat[id_kategori_produk], 'nama_kategori' => $kat[nama_kategori], produk => $produks);
+			$produk = $this->model_app->produk_perkategori(0,0,$kat['id_kategori_produk'],6);
+			//$produk = $this->db->query("SELECT * FROM rb_produk WHERE id_kategori_produk=$kat[id_kategori_produk]");
+			foreach($produk->result_array() as $prod){
+				//echo $prod[nama_produk] . "<br>";
+				//$prd = $prod;
+				$arr[] = ["id_kategori" => $idk, "nama_kategori" => $ktg, "produk" => $prod];
+				//$arr[] = ["nama_kategori" => $ktg, "produk" => $prd];
+				//echo json_encode($prod);
+				//array_push($prd, $prod);
+			}	
+		}
+		echo json_encode($arr);
+	}
+
+	public function show4(){
+		$data = array(array(
+			'nama_kategori' => 'Pashmina Instan Tafea',
+			'produk' => null
+		),array(
+			'nama_kategori' => 'Pashmina Instan Raisa Lava',
+			'produk' => null
+		),array(
+			'nama_kategori' => 'Segitiga Instan Sasya',
+			'produk' => null
+		),array(
+			'nama_kategori' => 'Segitiga Instan Lolina',
+			'produk' => null
+		),array(
+			'nama_kategori' => 'Hijab Instan Tanika',
+			'produk' => array(array(
+				'nama_produk' => 'Pashmina Instan Diva Lava - DL85.5 Misty Sky'
+			),
+			array(
+				'nama_produk' => 'Pashmina Instan Rafella - RLN1.3 Lilac'
+			),
+			array(
+				'nama_produk' => 'Pashmina Instan Rafella - RLN1.1 Sweet Grey'
+			),
+			),
+		),
+		);
+		echo json_encode($data);
+	}
+
+	public function show2(){
+		$query = $this->db->query("SELECT * FROM rb_produk a JOIN rb_kategori_produk b ON a.id_kategori_produk=b.id_kategori_produk GROUP BY b.id_kategori_produk")->result();
+		echo json_encode($query);
 	}
 
 	function kategori(){
