@@ -112,7 +112,8 @@ class Api extends REST_Controller {
             $data = [];
             $data = array(
                 'result' => 1,
-                'message' => "Login Berhasil"
+                'message' => "Login Berhasil",
+                'data' => $query->result()
             );
             $this->response($data, REST_Controller::HTTP_OK);
         }else{
@@ -125,6 +126,35 @@ class Api extends REST_Controller {
         }
         
     }
+
+    function cekuser_post(){
+        $json = file_get_contents('php://input');
+        $obj = json_decode($json, TRUE);
+        $id_konsumen = strip_tags($obj['id_konsumen']);
+        //$username = strip_tags($this->input->post('username'));
+		//$password = hash("sha512", md5(strip_tags($this->input->post('password'))));
+        $query = $this->db->query("SELECT * FROM rb_konsumen where id_konsumen='".$id_konsumen."'");
+        $check = $query->num_rows();
+
+        if($check > 0){
+            $data = [];
+            $data = array(
+                'result' => 1,
+                'message' => "Login Berhasil",
+                'data' => $query->result()
+            );
+            $this->response($data, REST_Controller::HTTP_OK);
+        }else{
+            $data = [];
+            $data = array(
+                'result' => 0,
+                'message' => 'Username/Password Salah'
+            );
+            $this->response($data, REST_Controller::HTTP_OK);
+        }
+        
+    }
+
 
     
 
