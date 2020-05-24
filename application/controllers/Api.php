@@ -152,7 +152,15 @@ class Api extends REST_Controller {
             );
             $this->response($data, REST_Controller::HTTP_OK);
         }
-        
+    }
+
+    function cart_get(){
+        $id_konsumen = $_GET['id_konsumen'];
+        $query = $this->db->query("SELECT a.*, b.nama_produk,b.gambar,b.diskon FROM rb_penjualan_temp a JOIN rb_produk b ON a.id_produk=b.id_produk WHERE a.id_konsumen=$id_konsumen");
+        //$query = $this->model_app->view_where('rb_penjualan_temp',array('id_konsumen'=>$id_konsumen));
+        $cek = $query->num_rows();
+        $result = $query->result();
+        $this->response($result, REST_Controller::HTTP_OK);
     }
 
 
