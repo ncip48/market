@@ -162,7 +162,7 @@ class Api extends REST_Controller
 
         $j = $this->db->query("SELECT * FROM rb_kategori_produk")->num_rows();
         $jumlah = $j * 6;
-        $query = $this->db->query("SELECT id_produk, id_kategori_produk as id_kat, nama_produk,harga_konsumen,gambar FROM rb_produk ORDER BY id_produk DESC LIMIT $jumlah");
+        $query = $this->db->query("SELECT *, id_kategori_produk as id_kat FROM rb_produk ORDER BY id_produk DESC LIMIT $jumlah");
 
         $mysql_result = $query->result_array();
 
